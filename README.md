@@ -1,2 +1,2 @@
 # build
-A simple console tool for elegant and convenient building of C++ projects
+A simple CLI tool for elegant and convenient building of C++ projects
