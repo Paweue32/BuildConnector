@@ -10,7 +10,7 @@
 namespace fs = std::filesystem;
 bool verbose;
 const fs::path var_file("/usr/local/etc/build_vars.json");
-const fs::path target("/home/peakeue/Documents/cpp_projects/build/testing_env/result");
+fs::path target;
 
 bool compile(const std::string& file_base) {
     // Preprocessing

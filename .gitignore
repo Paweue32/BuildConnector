@@ -1,2 +1,5 @@
 # env setup
 .vscode/
+
+# build files
+build/
