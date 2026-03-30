@@ -14,7 +14,7 @@ struct library {
     std::string compiled_lib;
 };
 
-inline bool var_module_initialized;
+inline bool var_module_initialized = 0;
 inline fs::path variable_file_path;
 inline json::object variable_file_content;
 
