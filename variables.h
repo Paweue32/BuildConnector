@@ -18,7 +18,7 @@ extern bool var_module_initialized;
 extern fs::path variable_file_path;
 extern json::object variable_file_content;
 
-extern bool create_var_file(const fs::path& file_path);
+extern void create_var_file(const std::string& user_name);
 extern void init_var_module();
 extern void view_variables(bool as_cvs, bool with_headers);
 extern void set_variable(const std::string& var_name, const std::string& header_file, const std::string& compiled_lib, bool overwrite_warning);
