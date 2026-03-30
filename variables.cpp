@@ -1,11 +1,5 @@
 #include "variables.h"
 
-bool var_module_initialized = 0;
-
-fs::path variable_file_path;
-
-json::object variable_file_content;
-
 void dir_creatation_error(const fs::path& attempted) {
     throw std::runtime_error(std::string("Error: unable to create directory ") + attempted.string() + " which is vital for the program's variable features");
 }
