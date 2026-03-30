@@ -7,6 +7,8 @@
 #include <cstring>
 #include <boost/json.hpp>
 
+#include "variables.h"
+
 namespace fs = std::filesystem;
 bool verbose;
 const fs::path var_file("/usr/local/etc/build_vars.json");
@@ -59,6 +61,9 @@ void varedit() {
 }
 
 int main(int argc, char **argv) {
+    view_variables(1, 1);
+    return 0;
+
     // Varedit mode
     if(argc == 2 && strcmp(argv[1], "varedit") == 0) {
         varedit();
