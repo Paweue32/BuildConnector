@@ -55,7 +55,12 @@ void init_var_module() {
         throw std::runtime_error(std::string("Error: unable to open file ") + variable_file_path.string());
     }
     
-    variable_file_content = json::parse(json_data).as_object();
+    try {
+        variable_file_content = json::parse(json_data).as_object();
+    }
+    catch (...) {
+        throw std::runtime_error(std::string("Error: variables file corrupted. Path to file: ") + variable_file_path.string());
+    }
 
     var_module_initialized = 1;
 }
