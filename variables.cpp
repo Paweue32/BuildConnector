@@ -59,6 +59,20 @@ void init_var_module() {
     var_module_initialized = 1;
 }
 
+const char* text(variable_type vt) {
+    switch(vt) {
+        case variable_type::PATH:
+            return "Path";
+            break;
+        case variable_type::FLAG:
+            return "Flag";
+            break;
+        default:
+            return "Unknown";
+            break;
+    }
+}
+
 void view_variables(bool as_cvs, bool with_headers) {
     if(!var_module_initialized) {
         init_var_module();
@@ -67,10 +81,57 @@ void view_variables(bool as_cvs, bool with_headers) {
     const char separator = as_cvs ? ',' : '\t';
 
     if(with_headers) {
-        std::cout << "Alias" << separator << "Header file path" << separator << "Compiled library path\n";
+        std::cout << "Variable name" << separator << "Variable type" << separator << "Variable content\n";
     }
 
     for(const json::key_value_pair& i: variable_file_content) {
         std::cout << i.key() << separator << i.value().as_array().at(0).as_string().c_str() << separator << i.value().as_array().at(1).as_string().c_str() << '\n';
     }
+}
+
+void set_variable(const std::string& var_name, const library& content, bool overwrite_warning) {
+    if(!var_module_initialized) {
+        init_var_module();
+    }
+
+    auto json_iter = variable_file_content.find(var_name);
+    if(json_iter == variable_file_content.end()) {
+        variable_file_content[var_name] = json::array{text(content.kind), content.compiled_lib};
+        return;
+    }
+
+    if(overwrite_warning) {
+        std::cout << "Variable " << var_name << " already exists.\nType: " << json_iter->value().as_array().at(0).as_string() << "\nContent: " << json_iter->value().as_array().at(1).as_string() << "\nAre you sure you want to replace it (yes / no)? ";
+        std::string ans;
+        std::getline(std::cin, ans);
+        std::getline(std::cin, ans);
+        while(ans != "yes" && ans != "no") {
+            std::cout << "Not a viable response.\nDo you want to replace the variable (yes / no)? ";
+            std::getline(std::cin, ans);
+        }
+
+        if(ans == "no") {
+            return;
+        }
+    }
+
+    variable_file_content[var_name] = json::array{text(content.kind), content.compiled_lib};
+}
+
+void delete_variable(const std::string& var_name) {
+    if(!var_module_initialized) {
+        init_var_module();
+    }
+
+    variable_file_content.erase(var_name);
+}
+
+void write_changes() {
+    if(!var_module_initialized) {
+        init_var_module();
+    }
+
+    std::ofstream json_data(variable_file_path);
+    json_data << variable_file_content << std::endl;
+    json_data.close();
 }

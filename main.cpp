@@ -61,7 +61,6 @@ void varedit() {
 }
 
 int main(int argc, char **argv) {
-    view_variables(1, 1);
     return 0;
 
     // Varedit mode
