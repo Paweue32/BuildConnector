@@ -94,7 +94,6 @@ void set_variable(const std::string& var_name, const library& content, bool over
         std::cout << "Variable " << var_name << " already exists.\nType: " << json_iter->value().as_array().at(0).as_string() << "\nContent: " << json_iter->value().as_array().at(1).as_string() << "\nAre you sure you want to replace it (yes / no)? ";
         std::string ans;
         std::getline(std::cin, ans);
-        std::getline(std::cin, ans);
         while(ans != "yes" && ans != "no") {
             std::cout << "Not a viable response.\nDo you want to replace the variable (yes / no)? ";
             std::getline(std::cin, ans);

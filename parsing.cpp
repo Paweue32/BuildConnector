@@ -20,7 +20,34 @@ void parse_default(const std::vector<std::string>& args) {
 }
 
 void parse_varset(const std::vector<std::string>& args) {
-    ;
+    bool as_flag = 0, warn = 0;
+    std::string key, value;
+
+    for(size_t i=2;i<args.size();i++) {
+        if(args[i][0] == '-') {
+            for(size_t j=1;j<args[i].size();j++) {
+                if(args[i][j] == 'f') {
+                    as_flag = 1;
+                }
+                else if(args[i][j] == 'w') {
+                    warn = 1;
+                }
+                else {
+                    crash(std::string("flag -") + args[i][j] + " not supported in the \"alias set\" script");
+                }
+            }
+        }
+        else {
+            if(i+1 >= args.size()) {
+                crash("no value for the alias provided");
+            }
+            set_variable(args[i], {as_flag ? "Flag" : "Path", args[i+1]}, warn);
+            write_changes();
+            exit(EXIT_SUCCESS);
+        }
+    }
+
+    crash("no information provided");
 }
 
 void parse_varread(const std::vector<std::string>& args) {
@@ -34,7 +61,7 @@ void parse_varread(const std::vector<std::string>& args) {
                     as_csv = 1;
                 }
                 else {
-                    crash(std::string("flag -") + args[i][j] + " not supported in the \"alias table\" script");
+                    crash(std::string("flag -") + args[i][j] + " not supported in the \"alias lookup\" script");
                 }
             }
         }
