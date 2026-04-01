@@ -11,6 +11,7 @@ add_executable(buildcon
         parsing.cpp
         variables.cpp
         compile.cpp
+        crash.cpp
 )
 
 target_link_libraries(buildcon PRIVATE Boost::json)
