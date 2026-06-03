@@ -4,55 +4,19 @@
 #include <iostream>
 #include <vector>
 #include <filesystem>
+#include <deque>
+#include "variables.h"
 
 namespace fs = std::filesystem;
 
-inline bool verbose;
-inline fs::path target;
+//inline bool verbose;
+//inline fs::path target;
 
-/*bool compile(const std::string& file_base) {
-    // Preprocessing
-    system((std::string("g++ -E ") + file_base + ".cpp > " + file_base + ".ii || rm " + file_base + ".ii").c_str());
-    if(!fs::exists(fs::path(file_base + ".ii"))) {
-        return 0;
-    }
-    if(verbose) {
-        std::cout << "Preprocessed " << file_base << ".cpp" << std::endl;
-    }
-    
-    // Actually compiling
-    if(verbose) {
-        system((std::string("g++ -c ") + file_base + ".ii -o " + file_base + ".o -Wall").c_str());
-    }
-    else {
-        system((std::string("g++ -c ") + file_base + ".ii -o " + file_base + ".o").c_str());
-    }
-
-    if(!fs::exists(fs::path(file_base + ".o"))) {
-        system((std::string("rm ") + file_base + ".ii").c_str());
-        return 0;
-    }
-    std::cout << "Compiled " << file_base << ".cpp" << std::endl;
-
-    system((std::string("rm ") + file_base + ".ii").c_str());
-    return 1;
-}
-
-void link(const std::vector<std::string>& object_files) {
-    std::string command = "g++ ";
-    for(const std::string& objection: object_files) {
-        command += objection + ' ';
-    }
-    command += std::string("-o ") + target.string();
-    std::cout << command << std::endl;
-    system(command.c_str());
-}
-
-void file_cleanup(const std::string& file_base) {
-    fs::remove(fs::path(file_base + ".o"));
-}*/
-
-
+bool compile(const std::string& file_base, bool verbose, bool save_temps);
+void link(const std::vector<std::string>& object_files, const fs::path& target);
+void file_cleanup(const std::string& file_base);
+std::vector<std::string> get_files();
+void do_your_thing(std::deque<std::pair<std::string, int>>& sources, std::deque<std::pair<std::string, int>>& vars, std::deque<std::pair<std::string, int>>& library_flags);
 // Getting the files
     /*std::vector<std::string> files;
     for(const fs::__cxx11::directory_entry& dirEntry: fs::directory_iterator(fs::current_path())) {

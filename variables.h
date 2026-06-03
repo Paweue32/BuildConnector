@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <string>
 #include <boost/json.hpp>
-#include "crash.h"
+#include "utils.h"
 
 namespace fs = std::filesystem;
 namespace json = boost::json;
@@ -16,13 +16,17 @@ struct library {
     std::string compiled_lib;
 };
 
+enum class export_format {
+    JSON, CSV, HUMAN
+};
+
 inline bool var_module_initialized = 0;
 inline fs::path variable_file_path;
 inline json::object variable_file_content;
 
 void create_var_file(const std::string& user_name);
 void init_var_module();
-void view_variables(bool as_csv, bool with_headers);
+void view_variables(export_format format, bool with_headers);
 void set_variable(const std::string& var_name, const library& content, bool overwrite_warning);
 library read_variable(const std::string& var_name);
 void delete_variable(const std::string& var_name);

@@ -8,10 +8,12 @@ find_package(Boost REQUIRED COMPONENTS json)
 
 add_executable(buildcon
         main.cpp
+        network_client.cpp
+        packman.cpp
         parsing.cpp
-        variables.cpp
-        compile.cpp
-        crash.cpp
+        utils.cpp
 )
 
-target_link_libraries(buildcon PRIVATE Boost::json)
+target_link_libraries(buildcon PRIVATE boost_json)
+target_link_libraries(buildcon PRIVATE ssl)
+target_link_libraries(buildcon PRIVATE crypto)

@@ -63,12 +63,34 @@ void init_var_module() {
     var_module_initialized = 1;
 }
 
-void view_variables(bool as_csv, bool with_headers) {
+void view_variables(export_format format, bool with_headers) {
     if(!var_module_initialized) {
         init_var_module();
     }
 
-    const char separator = as_csv ? ',' : '\t';
+    if(format == export_format::JSON) {
+        if(with_headers) {
+            json::object output( {
+                {"Alias", json::array( {
+                    "Alias_type", "Alias_value"
+                } )}
+            } );
+
+            for(auto const& [key, value]: variable_file_content) {
+                output[key] = value;
+            }
+
+            std::cout << output << std::endl;
+        }
+        else {
+            std::cout << variable_file_content << std::endl;
+        }
+
+        return;
+    }
+
+
+    const char separator = (format == export_format::CSV) ? ',' : '\t';
 
     if(with_headers) {
         std::cout << "Alias" << separator << "Alias_type" << separator << "Alias_value\n";
