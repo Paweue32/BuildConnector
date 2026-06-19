@@ -1,10 +1,6 @@
 #include <queue>
 #include "compile.h"
 
-
-int compose(const std::vector<std::string_view>& args) { return EXIT_SUCCESS; }
-
-
 bool compile(const std::string& file_base, bool verbose, bool save_temps) {
     // Preprocessing
     system((std::string("g++ -E ") + file_base + ".cpp > " + file_base + ".ii").c_str());

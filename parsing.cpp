@@ -1,5 +1,6 @@
 #include "parsing.h"
 
+#include <format>
 #include "utils.h"
 
 std::pair<flags, std::vector<std::string_view>::const_iterator> parse_flags(std::vector<std::string_view>::const_iterator it, std::vector<std::string_view>::const_iterator end) {
@@ -17,7 +18,7 @@ std::pair<flags, std::vector<std::string_view>::const_iterator> parse_flags(std:
 
         for(;i<it->size();i++) {
             if(it->operator[](i) < 'a' || it->operator[](i) > 'z') {
-                crash(std::string("invalid flag '") + it->operator[](i) + "'");
+                crash(std::format("invalid flag '{}'", it->operator[](i)));
             }
 
             res[it->operator[](i)] = 1;

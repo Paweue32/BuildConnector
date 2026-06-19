@@ -8,9 +8,8 @@ find_package(Boost REQUIRED COMPONENTS json)
 
 add_executable(buildcon
         main.cpp
-        compile.cpp
-        packman.cpp
         network_client.cpp
+        packman.cpp
         parsing.cpp
         utils.cpp
 )

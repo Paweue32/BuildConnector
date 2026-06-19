@@ -6,9 +6,6 @@
 #include <vector>
 #include <optional>
 #include <httplib.h>
-#include <filesystem>
-
-namespace fs = std::filesystem;
 
 class NetworkClient {
 public:
@@ -18,7 +15,7 @@ public:
     ~NetworkClient() = default;
 
     std::vector<std::string> POST_scout(const std::vector<std::string>& libs);
-    std::vector<std::string> GET_download(const std::vector<std::string>& libs, const fs::path& target_dir);
+    std::vector<std::string> GET_download(const std::vector<std::string>& libs);
 
     NetworkClient& operator=(const NetworkClient& other) = delete;
     NetworkClient& operator=(NetworkClient&& other) = delete;

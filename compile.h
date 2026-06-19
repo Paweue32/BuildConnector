@@ -12,8 +12,6 @@ namespace fs = std::filesystem;
 //inline bool verbose;
 //inline fs::path target;
 
-int compose(const std::vector<std::string_view>& args);
-
 bool compile(const std::string& file_base, bool verbose, bool save_temps);
 void link(const std::vector<std::string>& object_files, const fs::path& target);
 void file_cleanup(const std::string& file_base);

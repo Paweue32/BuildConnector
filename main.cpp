@@ -1,4 +1,4 @@
-#include "utils.h" // init
+#include "utils.h"
 #include "packman.h" // install
 
 #include <iostream>
@@ -6,18 +6,19 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <format>
 
 
-int config(const std::vector<std::string_view>& args); // todo
-int init(const std::vector<std::string_view>& args); // done
-int compose(const std::vector<std::string_view>& args); // todo
-int install(const std::vector<std::string_view>& args); // todo
-int version(const std::vector<std::string_view>& args); // done
-int help(const std::vector<std::string_view>& args); // done
+int config(const std::vector<std::string_view>& args);
+int init(const std::vector<std::string_view>& args);
+int compose(const std::vector<std::string_view>& args);
+int include(const std::vector<std::string_view>& args);
+int version(const std::vector<std::string_view>& args);
+int help(const std::vector<std::string_view>& args);
 
 int main(int argc, char *argv[]) {
    if(argc < 2) {
-      crash(std::string("missing command\nTry '") + argv[0] + " --help' for more information.");
+      crash(std::format("missing command\nTry '{} --help' for more information.", argv[0]));
    }
 
    std::vector<std::string_view> args;
@@ -31,6 +32,7 @@ int main(int argc, char *argv[]) {
       {"init", init},
       {"compose", compose},
       {"install", install},
+      {"include", include},
       {"--version", version},
       {"-v", version},
       {"--help", help},
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
 
    auto it = router.find(args[1]);
    if(it == router.end()) {
-      crash(std::string("no command called '") + std::string(args[1]) + "'");
+      crash(std::format("no command called '{}'", args[1]));
    }
 
    return it->second(args);
@@ -52,9 +54,10 @@ int version(const std::vector<std::string_view>& args) {
 }
 
 int help(const std::vector<std::string_view>& args) {
-   if(args.size() > 2 && args[2] == "--help") {
-      return display_help("help", args[0]);
-   }
-
    return display_help("general", args[0]);
 }
+
+int config(const std::vector<std::string_view>& args) { return EXIT_SUCCESS; }
+int init(const std::vector<std::string_view>& args) { return EXIT_SUCCESS; }
+int compose(const std::vector<std::string_view>& args) { return EXIT_SUCCESS; }
+int include(const std::vector<std::string_view>& args) { return EXIT_SUCCESS; }
