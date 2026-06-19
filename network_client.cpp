@@ -8,9 +8,8 @@
 #include <boost/json.hpp>
 #include "utils.h"
 
-namespace fs = std::filesystem;
 std::optional<std::string> find_ca_bundle(const std::optional<std::string>& user_custom_path);
-bool download_file(const std::string& lib_name, const std::string& ca_cert_path, indicators::DynamicProgress<indicators::ProgressBar>& bar_list, size_t bar_num);
+bool download_file(const fs::path& target_dir, const std::string& lib_name, const std::string& ca_cert_path, indicators::DynamicProgress<indicators::ProgressBar>& bar_list, size_t bar_num);
 
 
 NetworkClient::NetworkClient(const std::optional<std::string>& custom_ca_cert_path) {
@@ -28,6 +27,9 @@ std::vector<std::string> NetworkClient::POST_scout(const std::vector<std::string
     try {
         httplib::Client cli(constants::server_addr);
         cli.set_ca_cert_path(ca_cert_path_);
+        cli.set_connection_timeout(5);
+        cli.set_read_timeout(10);
+        cli.set_write_timeout(5);
 
         boost::json::array content;
 
@@ -43,6 +45,10 @@ std::vector<std::string> NetworkClient::POST_scout(const std::vector<std::string
 
         httplib::Result res = cli.Post("/scout", json_payload, "application/json");
 
+        if(!res || res->status != 200) {
+            throw 1;
+        }
+
         boost::json::array lib_list = boost::json::parse(res->body).as_object().at("items").as_array();
 
         std::vector<std::string> final_list;
@@ -54,15 +60,14 @@ std::vector<std::string> NetworkClient::POST_scout(const std::vector<std::string
 
         return final_list;
 
-    } catch(const std::exception& e) {
-        //crash(e.what());
-        std::cerr << e.what() << std::endl;
+    } catch(...) {
+        crash("failed to fetch dependencies from the server");
     }
 
     return {};
 }
 
-std::vector<std::string> NetworkClient::GET_download(const std::vector<std::string>& libs) {
+std::vector<std::string> NetworkClient::GET_download(const std::vector<std::string>& libs, const fs::path& target_dir) {
     using namespace indicators;
 
     std::vector<std::future<bool>> download_threads;
@@ -85,7 +90,7 @@ std::vector<std::string> NetworkClient::GET_download(const std::vector<std::stri
             )
         );
         download_threads.push_back(
-            std::async(std::launch::async, download_file, libs[i], ca_cert_path_, std::ref(bars), i)
+            std::async(std::launch::async, download_file, target_dir, libs[i], ca_cert_path_, std::ref(bars), i)
         );
     }
 
@@ -116,6 +121,11 @@ std::optional<std::string> find_ca_bundle(const std::optional<std::string>& user
     std::vector<std::string> common_paths = {
         "/etc/ssl/certs/ca-certificates.crt",
         "/etc/pki/tls/certs/ca-bundle.crt",
+        "/etc/ssl/ca-bundle.pem",
+        "/etc/pki/tls/cacert.pem",
+        "/etc/ssl/cert.pem",
+        "/etc/openssl/certs/ca-certificates.crt",
+        "/usr/local/share/certs/ca-root-nss.crt",
         "/etc/ca-certificates/extracted/ca-bundle.trust.crt",
         "/var/lib/ca-certificates/ca-bundle.pem"
     };
@@ -130,9 +140,9 @@ std::optional<std::string> find_ca_bundle(const std::optional<std::string>& user
     return std::nullopt;
 }
 
-bool download_file(const std::string& lib_name, const std::string& ca_cert_path, indicators::DynamicProgress<indicators::ProgressBar>& bar_list, size_t bar_num) {
-    if(fs::exists(lib_name + ".tar.gz")) {
-        return true;
+bool download_file(const fs::path& target_dir, const std::string& lib_name, const std::string& ca_cert_path, indicators::DynamicProgress<indicators::ProgressBar>& bar_list, size_t bar_num) {
+    if(fs::exists(target_dir / (lib_name + ".tar.gz"))) {
+        fs::remove(target_dir / (lib_name + ".tar.gz"));
     }
 
     httplib::Client cli(constants::server_addr);
@@ -155,7 +165,7 @@ bool download_file(const std::string& lib_name, const std::string& ca_cert_path,
         return true;
     };
 
-    std::ofstream archive_file(lib_name + ".tar.gz", std::ios::binary);
+    std::ofstream archive_file(target_dir / (lib_name + ".tar.gz"), std::ios::binary);
     if(!archive_file.good()) {
         //crash(std::string("could not create file ") + lib_name + ".tar.gz");
         std::cerr << "Error: could not create file " << lib_name << ".tar.gz" << std::endl;
@@ -164,7 +174,7 @@ bool download_file(const std::string& lib_name, const std::string& ca_cert_path,
 
     auto content_receiver = [&everything_ok, &archive_file](const char *data, size_t data_length) {
         archive_file.write(data, data_length);
-        return true;
+        return archive_file.good();
     };
 
     auto download_progress = [&lib_name, &bar_list, bar_num, &percentage](size_t current, size_t total) {
@@ -203,6 +213,6 @@ int test() {
     }
     std::cout << std::endl;
 
-    nc.GET_download(final_list);
+    nc.GET_download(final_list, ".");
     return EXIT_SUCCESS;
 }

@@ -4,7 +4,6 @@
 #include <vector>
 #include <string_view>
 #include <assert.h>
-#include <format>
 #include "utils.h"
 
 struct flags {
@@ -19,7 +18,7 @@ struct flags {
     void assert_empty() {
         for(std::size_t i=0;i<26;i++) {
             if(used[i]) {
-                crash(std::format("invalid flag '{}'", static_cast<char>('a' + i)));
+                crash(std::string("invalid flag '") + static_cast<char>('a' + i) + "'");
             }
         }
     }
